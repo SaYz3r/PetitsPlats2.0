@@ -1,0 +1,172 @@
+* {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+}
+
+body {
+            font-family: 'Manrope', sans-serif;
+            background-color: #f5f5f5;
+}
+
+header {
+            position: relative;
+            height: 70vh;
+            min-height: 500px;
+            background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)),
+                        url('https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?w=1600') center/cover;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+}
+
+.header__logo {
+            margin-left: 40px;
+            position: absolute;
+            top: 40px;
+            left: 40px;
+            font-family: 'Anton', sans-serif;
+            font-size: 25px;
+            color: white;
+            font-weight: 400;
+            letter-spacing: 1px;
+}
+
+.header__logo img {
+            height: 24px;
+            width: 24px;
+}
+
+.header__title {
+            font-family: 'Anton', sans-serif;
+            font-weight: bold;
+            font-size: 44px;
+            color: #FFD15B;
+            text-align: center;
+            margin-bottom: 30px;
+            font-weight: 400;
+            letter-spacing: 2px;
+            line-height: 1.2;
+            max-width: 900px;
+}
+
+.header__search-container {
+            width: 100%;
+            max-width: 750px;
+            position: relative;
+}
+
+.header__search {
+            width: 100%;
+            padding: 20px 60px 20px 25px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-family: 'Manrope', sans-serif;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            outline: none;
+}
+
+.header__search::placeholder {
+            color: #999;
+}
+
+.header__search-btn {
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            background-color: #1B1B1B;
+            border: none;
+            border-radius: 8px;
+            width: 50px;
+            height: 50px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.2s;
+}
+
+.header__search-btn:hover {
+            background-color: #000;
+}
+
+.header__search-btn i {
+            color: white;
+            font-size: 20px;
+}
+
+/* Section des filtres */
+.filters {
+            background-color: #f5f5f5;
+            padding: 40px 20px;
+}
+
+.filters__container {
+            margin-left: 60px;
+            max-width: 1200px;
+            display: flex;
+            gap: 63px;
+            flex-wrap: wrap;
+}
+
+.filter {
+            background-color: white;
+            padding: 17px 16px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            gap: 63px;
+            cursor: pointer;
+            min-width: 179px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            transition: all 0.2s;
+}
+
+.filter:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+            transform: translateY(-1px);
+}
+
+.filter__icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 18px;
+            flex-shrink: 0;
+}
+
+.filter__icon--ingredients {
+            background: linear-gradient(135deg, #8B5CF6, #6366F1);
+}
+
+.filter__label {
+            font-size: 16px;
+            font-weight: 500;
+            color: #1B1B1B;
+            flex-grow: 1;
+}
+
+.filter__arrow {
+            color: #1B1B1B;
+            font-size: 16px;
+            transition: transform 0.2s;
+            font-family: "Font Awesome 6 Free";
+            font-weight: 900;
+        }
+
+        .filter__arrow::before {
+            content: "\f078";
+        }
+
+        .filter:hover .filter__arrow {
+            transform: translateY(2px);
+        }
