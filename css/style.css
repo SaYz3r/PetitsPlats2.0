@@ -107,68 +107,120 @@ header {
 
 .filters__container {
     margin-left: 60px;
-    max-width: 1200px;
+    margin-right: 60px;
+    max-width: 1400px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.filters__selects {
     display: flex;
     gap: 63px;
     flex-wrap: wrap;
 }
 
-.filter {
-    background-color: white;
-    padding: 17px 16px;
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    gap: 63px;
-    cursor: pointer;
+.filter-wrapper {
+    position: relative;
     min-width: 179px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-    transition: all 0.2s;
 }
 
-.filter:hover {
+.filter-select {
+    width: 100%;
+    background-color: white;
+    padding: 17px 40px 17px 16px;
+    border: none;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 500;
+    color: #1B1B1B;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    transition: all 0.2s;
+    appearance: none;
+    font-family: 'Manrope', sans-serif;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%231B1B1B' d='M6 8L0 0h12z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 16px center;
+    background-size: 12px 8px;
+}
+
+.filter-select:hover {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
     transform: translateY(-1px);
 }
 
-.filter__icon {
-    width: 36px;
-    height: 36px;
-    border-radius: 50%;
+.filter-select:focus {
+    outline: 2px solid #FFD15B;
+    outline-offset: 2px;
+}
+
+.filter-select option:first-child {
+    color: #1B1B1B;
+    font-weight: 500;
+}
+
+.filter-select option:not(:first-child) {
+    color: #1B1B1B;
+    padding: 10px;
+}
+
+/* Compteur de recettes */
+.recipe-count {
+    font-size: 21px;
+    font-weight: 400;
+    color: #1B1B1B;
+    white-space: nowrap;
+    font-family: 'Anton', sans-serif;
+}
+
+/* Tags */
+.tags-container {
+    max-width: 1400px;
+    margin: 20px 60px 0 60px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    min-height: 0;
+}
+
+.tag {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background-color: #FFD15B;
+    padding: 12px 18px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 400;
+    color: #1B1B1B;
+}
+
+.tag__text {
+    line-height: 1;
+}
+
+.tag__close {
+    background: none;
+    border: none;
+    color: #1B1B1B;
+    font-size: 18px;
+    cursor: pointer;
+    padding: 0;
+    width: 18px;
+    height: 18px;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: white;
-    font-weight: 700;
-    font-size: 18px;
-    flex-shrink: 0;
-}
-
-.filter__icon--ingredients {
-    background: linear-gradient(135deg, #8B5CF6, #6366F1);
-}
-
-.filter__label {
-    font-size: 16px;
-    font-weight: 500;
-    color: #1B1B1B;
-    flex-grow: 1;
-}
-
-.filter__arrow {
-    color: #1B1B1B;
-    font-size: 16px;
+    line-height: 1;
     transition: transform 0.2s;
-    font-family: "Font Awesome 6 Free";
-    font-weight: 900;
+    font-weight: normal;
 }
 
-.filter__arrow::before {
-    content: "\f078";
-}
-
-.filter:hover .filter__arrow {
-    transform: translateY(2px);
+.tag__close:hover {
+    transform: scale(1.2);
 }
 
 /* Section des recettes */

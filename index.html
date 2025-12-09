@@ -30,21 +30,30 @@
 
             <section class="filters">
                         <div class="filters__container">
-                                    <div class="filter">
-                                                <span class="filter__label">Ingrédients</span>
-                                                <i class="fa-solid fa-chevron-down filter__arrow"></i>
+                                    <div class="filters__selects">
+                                    <div class="filter-wrapper">
+                                    <select class="filter-select" id="filter-ingredients">
+                                                <option value="">Ingrédients</option>
+                                    </select>
                                     </div>
 
-                                    <div class="filter">
-                                                <span class="filter__label">Appareils</span>
-                                                <i class="fa-solid fa-chevron-down filter__arrow"></i>
+                                    <div class="filter-wrapper">
+                                    <select class="filter-select" id="filter-appliances">
+                                                <option value="">Appareils</option>
+                                    </select>
                                     </div>
 
-                                    <div class="filter">
-                                                <span class="filter__label">Ustensiles</span>
-                                                <i class="fa-solid fa-chevron-down filter__arrow"></i>
+                                    <div class="filter-wrapper">
+                                    <select class="filter-select" id="filter-ustensils">
+                                                <option value="">Ustensiles</option>
+                                    </select>
                                     </div>
+                                    </div>
+
+                                    <div class="recipe-count" id="recipe-count"></div>
                         </div>
+
+                        <div class="tags-container" id="tags-container"></div>
             </section>
 
             <main class="recipes">
@@ -53,6 +62,7 @@
                         </div>
             </main>
 
+            <script src="scripts/utils/filterManager.js"></script>
             <script src="data/recipes.js"></script>
             <script src="scripts/templates/recipeCard.js"></script>
             <script src="scripts/pages/index.js"></script>
