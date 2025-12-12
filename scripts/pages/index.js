@@ -45,35 +45,31 @@ function initSearchBar() {
     
     if (!searchInput) return;
 
-    // Recherche lors de la saisie (avec délai)
-    let searchTimeout;
-    searchInput.addEventListener('input', (e) => {
-        clearTimeout(searchTimeout);
-        searchTimeout = setTimeout(() => {
-            const searchTerm = e.target.value.trim();
-            if (searchTerm.length >= 3 || searchTerm.length === 0) {
-                filterManager.setSearchTerm(searchTerm);
-            }
-        }, 300);
-    });
+    // Fonction de recherche
+    const performSearch = () => {
+        const searchTerm = searchInput.value.trim();
+        if (searchTerm.length >= 3) {
+            filterManager.setSearchTerm(searchTerm);
+            // Vider l'input après la recherche
+            searchInput.value = '';
+        } else if (searchTerm.length === 0) {
+            filterManager.setSearchTerm('');
+        }
+    };
 
     // Recherche au clic sur le bouton
     if (searchBtn) {
-        searchBtn.addEventListener('click', () => {
-            const searchTerm = searchInput.value.trim();
-            if (searchTerm.length >= 3 || searchTerm.length === 0) {
-                filterManager.setSearchTerm(searchTerm);
-            }
+        searchBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            performSearch();
         });
     }
 
     // Recherche à l'appui sur Entrée
     searchInput.addEventListener('keypress', (e) => {
         if (e.key === 'Enter') {
-            const searchTerm = searchInput.value.trim();
-            if (searchTerm.length >= 3 || searchTerm.length === 0) {
-                filterManager.setSearchTerm(searchTerm);
-            }
+            e.preventDefault();
+            performSearch();
         }
     });
 }

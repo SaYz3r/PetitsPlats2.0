@@ -7,8 +7,7 @@ class FilterManager {
         this.activeFilters = {
             ingredients: [],
             appliances: [],
-            ustensils: [],
-            search: ''
+            ustensils: []
         };
         this.filteredRecipes = [...recipes];
         this.tagsContainer = null;
@@ -119,18 +118,6 @@ class FilterManager {
     applyFilters() {
         let filtered = [...recipes];
 
-        // Filtre par recherche principale
-        if (this.activeFilters.search) {
-            const searchTerm = this.activeFilters.search.toLowerCase();
-            filtered = filtered.filter(recipe => {
-                return recipe.name.toLowerCase().includes(searchTerm) ||
-                       recipe.description.toLowerCase().includes(searchTerm) ||
-                       recipe.ingredients.some(ing => 
-                           ing.ingredient.toLowerCase().includes(searchTerm)
-                       );
-            });
-        }
-
         // Filtre par ingrédients
         if (this.activeFilters.ingredients.length > 0) {
             filtered = filtered.filter(recipe => {
@@ -204,8 +191,6 @@ class FilterManager {
 
         const availableOptions = this.getAvailableOptions(type);
         
-        console.log(`Mise à jour du select "${type}" avec ${availableOptions.length} options`);
-        
         // Sauvegarder le texte de la première option
         const placeholderText = select.options[0]?.text || type.charAt(0).toUpperCase() + type.slice(0, -1);
         
@@ -256,16 +241,124 @@ class FilterManager {
             }
         });
 
-        const options = Array.from(optionsSet).sort();
-        console.log(`Options disponibles pour ${type}:`, options);
-        return options;
+        return Array.from(optionsSet).sort();
+    }
+
+    /**
+     * Normalise une chaîne de caractères (enlève les accents, convertit en minuscules)
+     * @param {string} str - Chaîne à normaliser
+     * @returns {string} - Chaîne normalisée
+     */
+    normalizeString(str) {
+        return str.toLowerCase()
+                  .normalize("NFD")
+                  .replace(/[\u0300-\u036f]/g, "")
+                  .trim();
+    }
+
+    /**
+     * Vérifie si le terme de recherche existe dans les filtres disponibles
+     * @param {string} term - Terme à vérifier
+     * @returns {object|null} - {type, value} si trouvé, null sinon
+     */
+    checkTermInFilters(term) {
+        const termNormalized = this.normalizeString(term);
+        
+        // Récupérer toutes les options de tous les types depuis TOUTES les recettes
+        const allIngredients = [];
+        const allAppliances = [];
+        const allUstensils = [];
+        
+        recipes.forEach(recipe => {
+            recipe.ingredients.forEach(ing => {
+                if (!allIngredients.includes(ing.ingredient)) {
+                    allIngredients.push(ing.ingredient);
+                }
+            });
+            
+            if (!allAppliances.includes(recipe.appliance)) {
+                allAppliances.push(recipe.appliance);
+            }
+            
+            recipe.ustensils.forEach(ust => {
+                if (!allUstensils.includes(ust)) {
+                    allUstensils.push(ust);
+                }
+            });
+        });
+        
+        // Vérifier dans les ingrédients
+        for (let ingredient of allIngredients) {
+            if (this.normalizeString(ingredient) === termNormalized) {
+                return { type: 'ingredients', value: ingredient };
+            }
+        }
+        
+        // Vérifier dans les appareils
+        for (let appliance of allAppliances) {
+            if (this.normalizeString(appliance) === termNormalized) {
+                return { type: 'appliances', value: appliance };
+            }
+        }
+        
+        // Vérifier dans les ustensiles
+        for (let ustensil of allUstensils) {
+            if (this.normalizeString(ustensil) === termNormalized) {
+                return { type: 'ustensils', value: ustensil };
+            }
+        }
+        
+        return null;
     }
 
     /**
      * Met à jour la recherche principale
      */
     setSearchTerm(term) {
-        this.activeFilters.search = term;
-        this.applyFilters();
+        // Si le terme est vide, ne rien faire
+        if (!term || term.length === 0) {
+            return;
+        }
+
+        // Si le terme est trop court, ne rien faire
+        if (term.length < 3) {
+            return;
+        }
+
+        // Vérifier si le terme existe dans les filtres
+        const filterMatch = this.checkTermInFilters(term);
+        
+        if (filterMatch) {
+            // Ajouter comme filtre normal
+            this.addFilter(filterMatch.type, filterMatch.value);
+        } else {
+            // Afficher un message d'erreur ou ne rien faire
+            console.log(`Le terme "${term}" ne correspond à aucun ingrédient, appareil ou ustensile`);
+            
+            // Optionnel : Afficher un message à l'utilisateur
+            this.showSearchError(term);
+        }
+    }
+
+    /**
+     * Affiche un message d'erreur temporaire
+     */
+    showSearchError(term) {
+        // Chercher s'il y a déjà un message d'erreur
+        let errorMsg = document.querySelector('.search-error');
+        
+        if (!errorMsg) {
+            errorMsg = document.createElement('div');
+            errorMsg.classList.add('search-error');
+            this.tagsContainer.appendChild(errorMsg);
+        }
+        
+        errorMsg.textContent = `"${term}" ne correspond à aucun ingrédient, appareil ou ustensile`;
+        errorMsg.style.display = 'block';
+        
+        // Masquer le message après 3 secondes
+        setTimeout(() => {
+            errorMsg.style.display = 'none';
+        }, 3000);
     }
 }
