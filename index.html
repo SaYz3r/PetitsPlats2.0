@@ -31,23 +31,56 @@
             <section class="filters">
                         <div class="filters__container">
                                     <div class="filters__selects">
-                                    <div class="filter-wrapper">
-                                    <select class="filter-select" id="filter-ingredients">
-                                                <option value="">Ingrédients</option>
-                                    </select>
-                                    </div>
+                                                <div class="filter-wrapper" data-filter-type="ingredients">
+                                                            <div class="filter-dropdown">
+                                                                        <div class="filter-dropdown__header" id="filter-header-ingredients">
+                                                                                    <span>Ingrédients</span>
+                                                                                    <i class="fa-solid fa-chevron-down filter-dropdown__arrow"></i>
+                                                                        </div>
+                                                                        <div class="filter-dropdown__content" style="display: none;">
+                                                                                    <div class="filter-dropdown__search">
+                                                                                                <input type="text" class="filter-dropdown__input" placeholder="Rechercher..." data-filter-type="ingredients">
+                                                                                                <i class="fa-solid fa-search filter-dropdown__search-icon"></i>
+                                                                                    </div>
+                                                                                    <div class="filter-dropdown__tags" id="tags-ingredients"></div>
+                                                                                    <div class="filter-dropdown__list" id="list-ingredients"></div>
+                                                                        </div>
+                                                            </div>
+                                                </div>
 
-                                    <div class="filter-wrapper">
-                                    <select class="filter-select" id="filter-appliances">
-                                                <option value="">Appareils</option>
-                                    </select>
-                                    </div>
+                                                <div class="filter-wrapper" data-filter-type="appliances">
+                                                            <div class="filter-dropdown">
+                                                                        <div class="filter-dropdown__header" id="filter-header-appliances">
+                                                                                    <span>Appareils</span>
+                                                                                    <i class="fa-solid fa-chevron-down filter-dropdown__arrow"></i>
+                                                                        </div>
+                                                                        <div class="filter-dropdown__content" style="display: none;">
+                                                                                    <div class="filter-dropdown__search">
+                                                                                                <input type="text" class="filter-dropdown__input" placeholder="Rechercher..." data-filter-type="appliances">
+                                                                                                <i class="fa-solid fa-search filter-dropdown__search-icon"></i>
+                                                                                    </div>
+                                                                                    <div class="filter-dropdown__tags" id="tags-appliances"></div>
+                                                                                    <div class="filter-dropdown__list" id="list-appliances"></div>
+                                                                        </div>
+                                                            </div>
+                                                </div>
 
-                                    <div class="filter-wrapper">
-                                    <select class="filter-select" id="filter-ustensils">
-                                                <option value="">Ustensiles</option>
-                                    </select>
-                                    </div>
+                                                <div class="filter-wrapper" data-filter-type="ustensils">
+                                                            <div class="filter-dropdown">
+                                                                        <div class="filter-dropdown__header" id="filter-header-ustensils">
+                                                                                    <span>Ustensiles</span>
+                                                                                    <i class="fa-solid fa-chevron-down filter-dropdown__arrow"></i>
+                                                                        </div>
+                                                                        <div class="filter-dropdown__content" style="display: none;">
+                                                                                    <div class="filter-dropdown__search">
+                                                                                                <input type="text" class="filter-dropdown__input" placeholder="Rechercher..." data-filter-type="ustensils">
+                                                                                                <i class="fa-solid fa-search filter-dropdown__search-icon"></i>
+                                                                                    </div>
+                                                                                    <div class="filter-dropdown__tags" id="tags-ustensils"></div>
+                                                                                    <div class="filter-dropdown__list" id="list-ustensils"></div>
+                                                                        </div>
+                                                            </div>
+                                                </div>
                                     </div>
 
                                     <div class="recipe-count" id="recipe-count"></div>

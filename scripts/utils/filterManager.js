@@ -5,13 +5,15 @@
 class FilterManager {
     constructor() {
         this.activeFilters = {
+            mainSearch: '',
             ingredients: [],
             appliances: [],
             ustensils: []
         };
         this.filteredRecipes = [...recipes];
         this.tagsContainer = null;
-        this.selectElements = {};
+        this.dropdowns = {};
+        this.searchInputs = {};
     }
 
     /**
@@ -20,41 +22,165 @@ class FilterManager {
     init() {
         this.tagsContainer = document.getElementById('tags-container');
         
-        // Récupérer les éléments select
-        this.selectElements = {
-            ingredients: document.getElementById('filter-ingredients'),
-            appliances: document.getElementById('filter-appliances'),
-            ustensils: document.getElementById('filter-ustensils')
-        };
-
-        // Vérifier que les selects existent
-        if (!this.selectElements.ingredients || !this.selectElements.appliances || !this.selectElements.ustensils) {
-            console.error('Les éléments select ne sont pas trouvés');
-            return;
-        }
-
-        // Peupler les selects avec toutes les recettes
-        this.updateAllSelects();
-
-        // Attacher les événements
-        this.attachEvents();
+        // Initialiser les 3 dropdowns
+        ['ingredients', 'appliances', 'ustensils'].forEach(type => {
+            this.initDropdown(type);
+        });
+        
+        // Fermer les dropdowns au clic extérieur
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.filter-wrapper')) {
+                this.closeAllDropdowns();
+            }
+        });
         
         console.log('FilterManager initialisé');
     }
 
     /**
-     * Attache les événements aux selects
+     * Initialise un dropdown spécifique
      */
-    attachEvents() {
-        Object.keys(this.selectElements).forEach(type => {
-            this.selectElements[type].addEventListener('change', (e) => {
-                const value = e.target.value;
-                if (value) {
-                    this.addFilter(type, value);
-                    e.target.value = ''; // Reset le select
-                }
-            });
+    initDropdown(type) {
+        const header = document.getElementById(`filter-header-${type}`);
+        const content = header.nextElementSibling;
+        const searchInput = content.querySelector('.filter-dropdown__input');
+        const list = document.getElementById(`list-${type}`);
+        const tagsContainer = document.getElementById(`tags-${type}`);
+        
+        this.dropdowns[type] = { header, content, list, tagsContainer };
+        this.searchInputs[type] = searchInput;
+        
+        // Toggle dropdown au clic sur le header
+        header.addEventListener('click', (e) => {
+            e.stopPropagation();
+            this.toggleDropdown(type);
         });
+        
+        // Recherche interne dans le dropdown
+        searchInput.addEventListener('input', (e) => {
+            this.filterDropdownOptions(type, e.target.value);
+        });
+        
+        // Empêcher la fermeture au clic dans le dropdown
+        content.addEventListener('click', (e) => {
+            e.stopPropagation();
+        });
+        
+        // Peupler la liste
+        this.updateDropdownList(type);
+    }
+
+    /**
+     * Toggle un dropdown (ouvrir/fermer)
+     */
+    toggleDropdown(type) {
+        const { header, content } = this.dropdowns[type];
+        const isOpen = content.style.display === 'block';
+        
+        // Fermer tous les autres dropdowns
+        this.closeAllDropdowns();
+        
+        if (!isOpen) {
+            content.style.display = 'block';
+            header.classList.add('active');
+            this.searchInputs[type].focus();
+        }
+    }
+
+    /**
+     * Ferme tous les dropdowns
+     */
+    closeAllDropdowns() {
+        Object.keys(this.dropdowns).forEach(type => {
+            const { header, content } = this.dropdowns[type];
+            content.style.display = 'none';
+            header.classList.remove('active');
+            this.searchInputs[type].value = '';
+            this.updateDropdownList(type);
+        });
+    }
+
+    /**
+     * Filtre les options du dropdown selon la recherche interne
+     */
+    filterDropdownOptions(type, searchTerm) {
+        const { list } = this.dropdowns[type];
+        const items = list.querySelectorAll('.filter-dropdown__item');
+        
+        items.forEach(item => {
+            const text = item.textContent.toLowerCase();
+            const matches = text.includes(searchTerm.toLowerCase());
+            item.style.display = matches ? 'block' : 'none';
+        });
+    }
+
+    /**
+     * Met à jour la liste d'un dropdown
+     */
+    updateDropdownList(type) {
+        const { list, tagsContainer } = this.dropdowns[type];
+        const availableOptions = this.getAvailableOptions(type);
+        
+        // Vider la liste
+        list.innerHTML = '';
+        
+        // Mettre à jour les tags dans le dropdown
+        this.updateDropdownTags(type);
+        
+        // Ajouter les options disponibles (SAUF celles déjà sélectionnées)
+        availableOptions.forEach(option => {
+            // Ne pas afficher si déjà sélectionné
+            if (this.activeFilters[type].includes(option)) {
+                return;
+            }
+            
+            const item = document.createElement('div');
+            item.classList.add('filter-dropdown__item');
+            item.textContent = option;
+            
+            item.addEventListener('click', () => {
+                this.addFilter(type, option);
+            });
+            
+            list.appendChild(item);
+        });
+    }
+
+    /**
+     * Met à jour les tags dans le dropdown
+     */
+    updateDropdownTags(type) {
+        const { tagsContainer } = this.dropdowns[type];
+        tagsContainer.innerHTML = '';
+        
+        this.activeFilters[type].forEach(value => {
+            const tag = document.createElement('div');
+            tag.classList.add('filter-dropdown__tag');
+            
+            const tagText = document.createElement('span');
+            tagText.textContent = value;
+            
+            const tagClose = document.createElement('span');
+            tagClose.classList.add('filter-dropdown__tag-close');
+            tagClose.innerHTML = '&times;';
+            
+            tagClose.addEventListener('click', (e) => {
+                e.stopPropagation();
+                this.removeFilter(type, value);
+            });
+            
+            tag.appendChild(tagText);
+            tag.appendChild(tagClose);
+            tagsContainer.appendChild(tag);
+        });
+    }
+
+    /**
+     * Définit la recherche principale
+     */
+    setMainSearch(searchTerm) {
+        this.activeFilters.mainSearch = searchTerm;
+        this.applyFilters();
     }
 
     /**
@@ -63,11 +189,10 @@ class FilterManager {
     addFilter(type, value) {
         const filterArray = this.activeFilters[type];
         
-        // Ne pas ajouter si déjà présent
         if (filterArray.includes(value)) return;
         
         filterArray.push(value);
-        this.addTag(type, value);
+        this.addTagToGlobal(type, value);
         this.applyFilters();
     }
 
@@ -80,14 +205,15 @@ class FilterManager {
         
         if (index > -1) {
             filterArray.splice(index, 1);
+            this.removeTagFromGlobal(type, value);
             this.applyFilters();
         }
     }
 
     /**
-     * Ajoute un tag visuel
+     * Ajoute un tag dans la zone globale
      */
-    addTag(type, value) {
+    addTagToGlobal(type, value) {
         const tag = document.createElement('div');
         tag.classList.add('tag');
         tag.setAttribute('data-type', type);
@@ -104,7 +230,6 @@ class FilterManager {
 
         tagClose.addEventListener('click', () => {
             this.removeFilter(type, value);
-            tag.remove();
         });
 
         tag.appendChild(tagText);
@@ -113,10 +238,35 @@ class FilterManager {
     }
 
     /**
+     * Retire un tag de la zone globale
+     */
+    removeTagFromGlobal(type, value) {
+        const tag = this.tagsContainer.querySelector(`[data-type="${type}"][data-value="${value}"]`);
+        if (tag) {
+            tag.remove();
+        }
+    }
+
+    /**
      * Applique tous les filtres actifs
      */
     applyFilters() {
         let filtered = [...recipes];
+
+        // Filtre par recherche principale
+        if (this.activeFilters.mainSearch && this.activeFilters.mainSearch.length >= 3) {
+            const searchTerm = this.activeFilters.mainSearch.toLowerCase();
+            
+            filtered = filtered.filter(recipe => {
+                const inTitle = recipe.name.toLowerCase().includes(searchTerm);
+                const inDescription = recipe.description.toLowerCase().includes(searchTerm);
+                const inIngredients = recipe.ingredients.some(ing => 
+                    ing.ingredient.toLowerCase().includes(searchTerm)
+                );
+                
+                return inTitle || inDescription || inIngredients;
+            });
+        }
 
         // Filtre par ingrédients
         if (this.activeFilters.ingredients.length > 0) {
@@ -160,10 +310,11 @@ class FilterManager {
         // Afficher les recettes filtrées
         displayRecipes(this.filteredRecipes);
 
-        // Mettre à jour tous les selects
-        this.updateAllSelects();
+        // Mettre à jour tous les dropdowns
+        Object.keys(this.dropdowns).forEach(type => {
+            this.updateDropdownList(type);
+        });
 
-        // Afficher un message si aucune recette
         const container = document.getElementById('recipes-container');
         if (this.filteredRecipes.length === 0) {
             container.innerHTML = '<p class="no-results">Aucune recette ne correspond à vos critères de recherche.</p>';
@@ -171,51 +322,7 @@ class FilterManager {
     }
 
     /**
-     * Met à jour tous les selects
-     */
-    updateAllSelects() {
-        this.updateSelect('ingredients');
-        this.updateSelect('appliances');
-        this.updateSelect('ustensils');
-    }
-
-    /**
-     * Met à jour un select spécifique
-     */
-    updateSelect(type) {
-        const select = this.selectElements[type];
-        if (!select) {
-            console.error(`Select "${type}" non trouvé`);
-            return;
-        }
-
-        const availableOptions = this.getAvailableOptions(type);
-        
-        // Sauvegarder le texte de la première option
-        const placeholderText = select.options[0]?.text || type.charAt(0).toUpperCase() + type.slice(0, -1);
-        
-        // Vider le select
-        select.innerHTML = '';
-        
-        // Recréer la première option (placeholder)
-        const firstOption = document.createElement('option');
-        firstOption.value = '';
-        firstOption.textContent = placeholderText;
-        select.appendChild(firstOption);
-
-        // Ajouter les options disponibles (sauf celles déjà sélectionnées)
-        availableOptions.forEach(option => {
-            if (!this.activeFilters[type].includes(option)) {
-                const optionElement = document.createElement('option');
-                optionElement.value = option;
-                optionElement.textContent = option;
-                select.appendChild(optionElement);
-            }
-        });
-    }
-
-    /**
-     * Récupère les options disponibles pour un type de filtre
+     * Récupère les options disponibles pour un type
      */
     getAvailableOptions(type) {
         const optionsSet = new Set();
@@ -242,123 +349,5 @@ class FilterManager {
         });
 
         return Array.from(optionsSet).sort();
-    }
-
-    /**
-     * Normalise une chaîne de caractères (enlève les accents, convertit en minuscules)
-     * @param {string} str - Chaîne à normaliser
-     * @returns {string} - Chaîne normalisée
-     */
-    normalizeString(str) {
-        return str.toLowerCase()
-                  .normalize("NFD")
-                  .replace(/[\u0300-\u036f]/g, "")
-                  .trim();
-    }
-
-    /**
-     * Vérifie si le terme de recherche existe dans les filtres disponibles
-     * @param {string} term - Terme à vérifier
-     * @returns {object|null} - {type, value} si trouvé, null sinon
-     */
-    checkTermInFilters(term) {
-        const termNormalized = this.normalizeString(term);
-        
-        // Récupérer toutes les options de tous les types depuis TOUTES les recettes
-        const allIngredients = [];
-        const allAppliances = [];
-        const allUstensils = [];
-        
-        recipes.forEach(recipe => {
-            recipe.ingredients.forEach(ing => {
-                if (!allIngredients.includes(ing.ingredient)) {
-                    allIngredients.push(ing.ingredient);
-                }
-            });
-            
-            if (!allAppliances.includes(recipe.appliance)) {
-                allAppliances.push(recipe.appliance);
-            }
-            
-            recipe.ustensils.forEach(ust => {
-                if (!allUstensils.includes(ust)) {
-                    allUstensils.push(ust);
-                }
-            });
-        });
-        
-        // Vérifier dans les ingrédients
-        for (let ingredient of allIngredients) {
-            if (this.normalizeString(ingredient) === termNormalized) {
-                return { type: 'ingredients', value: ingredient };
-            }
-        }
-        
-        // Vérifier dans les appareils
-        for (let appliance of allAppliances) {
-            if (this.normalizeString(appliance) === termNormalized) {
-                return { type: 'appliances', value: appliance };
-            }
-        }
-        
-        // Vérifier dans les ustensiles
-        for (let ustensil of allUstensils) {
-            if (this.normalizeString(ustensil) === termNormalized) {
-                return { type: 'ustensils', value: ustensil };
-            }
-        }
-        
-        return null;
-    }
-
-    /**
-     * Met à jour la recherche principale
-     */
-    setSearchTerm(term) {
-        // Si le terme est vide, ne rien faire
-        if (!term || term.length === 0) {
-            return;
-        }
-
-        // Si le terme est trop court, ne rien faire
-        if (term.length < 3) {
-            return;
-        }
-
-        // Vérifier si le terme existe dans les filtres
-        const filterMatch = this.checkTermInFilters(term);
-        
-        if (filterMatch) {
-            // Ajouter comme filtre normal
-            this.addFilter(filterMatch.type, filterMatch.value);
-        } else {
-            // Afficher un message d'erreur ou ne rien faire
-            console.log(`Le terme "${term}" ne correspond à aucun ingrédient, appareil ou ustensile`);
-            
-            // Optionnel : Afficher un message à l'utilisateur
-            this.showSearchError(term);
-        }
-    }
-
-    /**
-     * Affiche un message d'erreur temporaire
-     */
-    showSearchError(term) {
-        // Chercher s'il y a déjà un message d'erreur
-        let errorMsg = document.querySelector('.search-error');
-        
-        if (!errorMsg) {
-            errorMsg = document.createElement('div');
-            errorMsg.classList.add('search-error');
-            this.tagsContainer.appendChild(errorMsg);
-        }
-        
-        errorMsg.textContent = `"${term}" ne correspond à aucun ingrédient, appareil ou ustensile`;
-        errorMsg.style.display = 'block';
-        
-        // Masquer le message après 3 secondes
-        setTimeout(() => {
-            errorMsg.style.display = 'none';
-        }, 3000);
     }
 }
