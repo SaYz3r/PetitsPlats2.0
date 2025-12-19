@@ -2,39 +2,12 @@
  * Page principale - Gestion de l'affichage des recettes
  */
 
+import { recipes } from '/data/recipes.js';
+import { FilterManager } from '/scripts/utils/filterManager.js';
+import { displayRecipes } from '/scripts/templates/display.js';
+
 // Variables globales
 let filterManager;
-
-/**
- * Affiche toutes les recettes dans le container
- * @param {Array} recipesData - Tableau des recettes à afficher
- */
-function displayRecipes(recipesData) {
-    const recipesContainer = document.getElementById('recipes-container');
-    
-    // Vider le container avant d'afficher
-    recipesContainer.innerHTML = '';
-    
-    // Créer et ajouter chaque carte de recette
-    recipesData.forEach(recipe => {
-        const recipeCard = recipeCardTemplate(recipe);
-        const cardDOM = recipeCard.getRecipeCardDOM();
-        recipesContainer.appendChild(cardDOM);
-    });
-    
-    // Afficher le nombre de recettes
-    updateRecipeCount(recipesData.length);
-}
-
-/**
- * Met à jour le compteur de recettes
- */
-function updateRecipeCount(count) {
-    const countElement = document.getElementById('recipe-count');
-    if (countElement) {
-        countElement.textContent = `${count} recette${count > 1 ? 's' : ''}`;
-    }
-}
 
 /**
  * Initialise la barre de recherche principale
@@ -122,7 +95,7 @@ async function init() {
         displayRecipes(recipes);
         
         // Initialiser le gestionnaire de filtres APRÈS l'affichage
-        filterManager = new FilterManager();
+        filterManager = new FilterManager(recipes);
         filterManager.init();
         
         // Initialiser la barre de recherche

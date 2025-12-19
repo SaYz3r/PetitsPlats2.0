@@ -1,5 +1,5 @@
 function recipeCardTemplate(recipe) {
-    const { id, image, name, time, description, ingredients } = recipe;
+    const { image, name, time, description, ingredients } = recipe;
     const picture = `assets/images/plats/${image}`;
 
     function getRecipeCardDOM() {
@@ -91,3 +91,5 @@ function recipeCardTemplate(recipe) {
 
     return { getRecipeCardDOM };
 }
+
+export {recipeCardTemplate};

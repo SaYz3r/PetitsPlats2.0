@@ -2,8 +2,11 @@
  * Gestionnaire de filtres - Gère tous les filtres actifs et le filtrage des recettes
  */
 
+import { displayRecipes } from "/scripts/templates/display.js";
+
+
 class FilterManager {
-    constructor() {
+    constructor(recipes) {
         this.activeFilters = {
             mainSearch: '',
             ingredients: [],
@@ -14,6 +17,7 @@ class FilterManager {
         this.tagsContainer = null;
         this.dropdowns = {};
         this.searchInputs = {};
+        this.recipes = [...recipes];
     }
 
     /**
@@ -118,7 +122,7 @@ class FilterManager {
      * Met à jour la liste d'un dropdown
      */
     updateDropdownList(type) {
-        const { list, tagsContainer } = this.dropdowns[type];
+        const { list } = this.dropdowns[type];
         const availableOptions = this.getAvailableOptions(type);
         
         // Vider la liste
@@ -251,7 +255,7 @@ class FilterManager {
      * Applique tous les filtres actifs
      */
     applyFilters() {
-        let filtered = [...recipes];
+        let filtered = this.recipes;
 
         // Filtre par recherche principale
         if (this.activeFilters.mainSearch && this.activeFilters.mainSearch.length >= 3) {
@@ -328,7 +332,7 @@ class FilterManager {
         const optionsSet = new Set();
 
         // Utiliser les recettes filtrées
-        const recipesToUse = this.filteredRecipes.length > 0 ? this.filteredRecipes : recipes;
+        const recipesToUse = this.filteredRecipes.length > 0 ? this.filteredRecipes : this.recipes;
         
         recipesToUse.forEach(recipe => {
             switch(type) {
@@ -351,3 +355,5 @@ class FilterManager {
         return Array.from(optionsSet).sort();
     }
 }
+
+export {FilterManager};
